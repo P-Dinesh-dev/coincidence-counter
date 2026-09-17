@@ -143,3 +143,135 @@ Inverting the curves, including the Lambert-W two-branch degeneracy: for any
 measured rate below `1/(eτ)` there are **two** true rates consistent with it,
 and the rate alone cannot say which. Plus four independent ways to measure τ,
 cross-checked against each other.
+
+---
+
+## Stage 1 — Estimators and the four τ methods ✅ PASSED
+
+Stage 0 ran forwards. This runs backwards, which is the direction a real
+instrument has to work in.
+
+### `sim/estimators.py`
+
+**Non-paralyzable** inverts in one line, `n = m/(1-mτ)`, guarded at `mτ < 1`.
+Above that ceiling the model *cannot* produce the reading at all, so the
+result is `nan` rather than a large finite number — an unphysical measurement
+must not silently become a plausible-looking answer.
+
+**Paralyzable** does not invert elementarily. Taking logs of `m = n·exp(-nτ)`
+leaves `ln(n)` and `n` on the same side of the equation. Substituting
+`u = -nτ` turns it into `u·exp(u) = -mτ`, which is precisely the equation
+Lambert W solves, giving `n = -W(-mτ)/τ`.
+
+**The degeneracy.** W has two real branches over this domain, and both are
+physically valid answers:
+
+- `W₀` → `nτ < 1`, the low-rate branch, before the peak
+- `W₋₁` → `nτ > 1`, the high-rate branch, after the peak
+
+For any measured rate below the ceiling `1/(eτ)` there are **two** true rates
+consistent with it. In the worked example they differ by **14×**. A counter
+reporting 1637/s may be looking at 2,000/s or at 28,604/s, and nothing in that
+number distinguishes them.
+
+**Resolving it — `branch_from_perturbation`.** Since
+`dm/dn = exp(-nτ)·(1 - nτ)`, the sign of the measured change under a small
+increase in true rate is the sign of `(1 - nτ)` and nothing else. Nudge the
+source closer: reading rises → below the peak; reading falls → above it.
+Exact, requires no calibration, costs nothing.
+
+**Conditioning.** `dm/dn` vanishes at `nτ = 1`, so the inverse slope is
+infinite at the peak. Right at the turnover the measured rate carries *no*
+information about the true rate, and no estimator can repair that. It is a
+property of the physics, not of the algorithm.
+
+### `sim/tau_methods.py` — four independent measurements
+
+| | Method | Physics it leans on |
+|---|---|---|
+| A | two-source | true rates add, measured rates do not |
+| B | interval distribution | a gap shorter than τ never occurs |
+| C | Fano factor | dead time makes counts *too regular* |
+| D | pulser injection | you already know the true rate |
+
+**A — two sources, solved numerically.** `n₁₂ = n₁ + n₂` holds exactly for
+true rates. Rather than quote a closed form from memory, we root-find the τ
+that satisfies it, bracketed below the ceiling of the busiest measurement.
+This also means the same function works for either dead-time model — pass it
+the inversion you want.
+
+**B — shifted exponential.** With non-paralyzable dead time an accepted event
+waits τ, then waits an exponential time for the next particle. Observed gaps
+are therefore `τ + Exp(n)`. For that distribution the MLE of the shift is
+simply the **smallest gap observed**, and the rate follows from the mean of
+what remains. Biased slightly high — the minimum of a finite sample sits just
+above τ — and the bias shrinks with sample size.
+
+**C — Fano factor, derived not assumed.** For a renewal process with gap mean
+μ and variance σ², the count Fano factor over long bins tends to `σ²/μ²`.
+Non-paralyzable gaps are `τ + Exp(n)`, so `μ = τ + 1/n` and `σ² = 1/n²`:
+
+```
+F = (1/n²) / (τ + 1/n)²  =  1/(1 + nτ)²
+```
+
+and since `m = n/(1 + nτ)` gives `1 - mτ = 1/(1 + nτ)`:
+
+```
+F = (1 - mτ)²        →        τ = (1 - √F) / m
+```
+
+Pure Poisson gives `F = 1`. Anything below 1 is dead time leaving fingerprints
+on the *shape* of the distribution rather than on the rate. This is the method
+that needs no second source and no known rate — only a long record.
+
+**D — pulser, exact in closed form.** Both models rearrange per point with no
+fitting at all:
+
+```
+non-paralyzable    1/m = 1/n + τ      →   τ = 1/m − 1/n
+paralyzable        ln(n/m) = nτ       →   τ = ln(n/m)/n
+```
+
+This is the method that needs no radioactive source, only a generator whose
+rate you set yourself — which is exactly why the FPGA carries one, and why
+this project can be completed without buying anything.
+
+### Bug found and fixed during Stage 1
+
+The first draft computed the high-branch rate as `-ln(mτ)/τ`, an
+"obvious" rearrangement that silently drops the `ln(n)` term. It produced
+18,096/s where the truth is 28,604/s. The gate still *passed*, because the
+wrong value was on the correct side of the peak and so the branch test still
+came out right — a passing test hiding a wrong number.
+
+Caught by noticing the two branches produced visibly different measured rates
+(2,966 vs 1,628) when by construction they must produce the *same* one. After
+the fix they read 1,647 and 1,628 — equal within noise, which is the whole
+point of the degeneracy. Recorded here because the failure mode (a green test
+concealing a bad derivation) is worth remembering.
+
+### Result
+
+```
+true tau = 100.0 us (hidden from every method)
+
+  two-source     99.92 us    -0.1%   ok
+  intervals     100.00 us    +0.0%   ok
+  fano           94.12 us    -5.9%   ok
+  pulser         98.55 us    -1.5%   ok
+
+  measured            1637.5 /s
+  low-rate branch     2000.0 /s
+  high-rate branch   28604.0 /s   (14.3x apart)
+  nudge low:   1628.3 -> 1706.5  => low branch   ok
+  nudge high:  1647.4 -> 1490.0  => high branch  ok
+```
+
+The Fano method carries the largest error, as expected: it measures a variance
+rather than a mean, so its precision scales as `√(2/bins)` and it is the only
+one of the four that is statistics-limited rather than bias-limited.
+
+Figure: `figures/stage1_degeneracy_and_error.png`
+
+**Gate 1 passed.**
