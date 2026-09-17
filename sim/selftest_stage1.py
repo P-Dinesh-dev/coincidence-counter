@@ -53,7 +53,7 @@ def check_four_methods(rng):
     # each holding many events, so this run is deliberately the longest.
     duration = 1000
     _, times = measure(2000, duration, rng)
-    estimates["fano"], fano = tau_from_fano(times, duration, bin_width=0.2)
+    estimates["fano"], fano, fano_err = tau_from_fano(times, duration, bin_width=0.2)
 
     # D -- rates we chose ourselves, which is what the FPGA pulser will do.
     known = np.array([500, 1000, 2000, 4000, 8000])
@@ -68,6 +68,7 @@ def check_four_methods(rng):
 
     print(f"\n  (fano factor measured {fano:.4f}, expected "
           f"{(1 - 2000 / (1 + 2000 * TAU) * TAU) ** 2:.4f};"
+          f" fano s.e. {fano_err * 1e6:.2f} us;"
           f" pulser s.e. {pulser_err * 1e6:.2f} us)")
 
     return all(abs(t - TAU) / TAU < TOLERANCE for t in estimates.values())

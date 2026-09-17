@@ -58,6 +58,13 @@ def tau_from_fano(measured_times, duration, bin_width):
     dead time over long bins that suppression works out to F = (1 - m*tau)^2
     (derivation in SPEC.md), which rearranges to tau directly.
 
+    Returns tau, the Fano factor, and tau's uncertainty.  The uncertainty is
+    not decoration: this method measures a variance, so its error scales as
+    sqrt(2/bins), and when m*tau is small the whole signal lives in the third
+    decimal place of F.  Below roughly m*tau ~ 0.01 the error bar swallows the
+    answer, and the method returns a number that means nothing.  Reporting
+    that number without its error bar would be the dangerous kind of wrong.
+
     Needs bins long compared with the mean gap for the asymptotic form to
     hold; the caller chooses bin_width and is responsible for that.
     """
@@ -65,7 +72,14 @@ def tau_from_fano(measured_times, duration, bin_width):
     fano = counts.var() / counts.mean()
     measured_rate = len(measured_times) / duration
 
-    return (1 - np.sqrt(fano)) / measured_rate, fano
+    tau = (1 - np.sqrt(fano)) / measured_rate
+
+    # The variance of a sample variance over n_bins bins gives F a fractional
+    # error of sqrt(2/(n_bins-1)); propagate that through sqrt and the divide.
+    fano_error = fano * np.sqrt(2 / (len(counts) - 1))
+    tau_error = fano_error / (2 * np.sqrt(fano)) / measured_rate
+
+    return tau, fano, tau_error
 
 
 def tau_from_pulser(true_rates, measured_rates, model):

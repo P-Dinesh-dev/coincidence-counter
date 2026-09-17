@@ -485,3 +485,109 @@ matters is stated, not a target that was assumed.
 Reports: `synth/reports/` — regenerate with `python synth/run_synth.py`.
 
 **Gate 3 passed.**
+
+---
+
+## Stage 4 — Validation against data we did not generate ✅ PASSED
+
+Every earlier stage checked our work against simulations we wrote ourselves,
+which can only confirm that our algebra is self-consistent. This stage runs
+the pipeline over **62.8 hours of real cosmic-ray muon data** from a
+CosmicWatch v3X detector (`ATTRIBUTION.md`), and it is the first thing here
+that could tell us something we did not put in.
+
+It did.
+
+### The recording
+
+```
+events        687,941
+duration      226,189 s  (62.8 h)
+raw rate      3.0414 /s
+coincident    84,463 (12.3%)
+m*tau         0.00124   -- this detector is almost never busy
+```
+
+The detector logs its own accumulated dead time per event: mean **408.2 µs**,
+sd 19.0 µs, range 331–650 µs. So there is an independent number to test our
+estimators against rather than one we chose.
+
+### Cross-check: two routes to the same formula
+
+The CosmicWatch analysis divides counts by *live time*. This project inverts
+`m = n/(1+nτ)`. These are the same statement:
+
+```
+N / (T - N·τ)   ==   m / (1 - m·τ)      with m = N/T
+```
+
+Both give **3.04523 /s** from a raw 3.04145 /s, agreeing to 2 parts in 10⁹.
+Two people reaching the same formula from opposite directions is a small but
+real check that neither has misremembered it.
+
+### The finding: dead time the detector does not report
+
+Define **slack** = (gap between events) − (dead time the detector booked). If
+the reported dead time were the whole story, slack is just the wait for the
+next muon: exponential, mean 329 ms, populated all the way down to zero. Over
+688k events its minimum should sit around **0.48 µs**.
+
+The observed minimum slack is **57.0 µs**. Not one event in 687,941 arrived
+sooner than that after the reported dead period ended.
+
+```
+shortest gap ever seen          456.0 us
+shortest slack                   57.0 us
+expected if only reported         0.48 us
+negative slack (bookkeeping)        0
+```
+
+Under the exponential hypothesis the probability of that is `exp(-119)`,
+about **10⁻⁵²**. The detector therefore blocks for roughly **57 µs longer
+than it reports** — about 14% beyond its own figure. The figure shows it
+plainly: the data tracks the exponential expectation exactly above 57 µs and
+is *empty* below it.
+
+This is not a criticism of CosmicWatch; ~14% unreported blocking is
+immaterial at `mτ = 0.001`. It is the point of the exercise: an estimator
+built from timestamps alone found something the instrument's own accounting
+missed.
+
+### What that does to our four methods
+
+| | value | vs reported | vs effective |
+|---|---|---|---|
+| reported (detector) | 408.2 µs | — | — |
+| **effective** (reported + slack) | **465.2 µs** | — | — |
+| **B — intervals** | 456.0 µs | +11.7% | **−2.0%** |
+| **C — Fano** | 407.5 µs ± 11,991 µs | — | — |
+
+**Method B was not wrong.** Judged against the reported dead time it looks
+11.7% off; judged against the blocking that actually occurred it is within
+**2.0%**. It measures what the counter did, not what the counter said.
+
+**Method C is useless here, and says so.** Its error bar is ±11,991 µs on a
+407 µs answer — 29× the quantity being measured. At `mτ = 0.0014` the variance
+suppression it relies on (`F = 0.9975`) is far smaller than the scatter in `F`
+itself. Its apparent 0.2% agreement in the first draft of this analysis was
+**pure coincidence**, and was reported as a success until the error bar was
+computed.
+
+That near-miss is why `tau_from_fano` was changed to return its uncertainty
+alongside its answer. An estimator that returns a number without an error bar
+in a regime where it has no power is the dangerous kind of wrong: it looks
+like a confirmation.
+
+### A first draft that was wrong, recorded
+
+The first version of this analysis printed an explanation that Method B
+"estimates the floor of the dead-time distribution". That sounded reasonable
+and was false: 456 µs is *above* both the 331 µs minimum and the 408 µs mean,
+so it cannot be estimating a floor. Checking the arithmetic — if τ were
+constant at 408 µs the shortest gap over 688k events should be ≈408.5 µs —
+is what exposed the 57 µs excess. The wrong explanation was load-bearing
+until it was tested.
+
+Figure: `figures/stage4_real_data.png`
+
+**Gate 4 passed.**
