@@ -1,0 +1,16 @@
+Synthesis (yosys, iCE40)
+  LUT4            301
+  flip-flops      370
+  carry cells     141
+
+Place and route (up5k, sg48)
+  logic cells   539/5280  (10%)
+  Fmax          40.05 - 43.28 MHz over 6 seeds (median 41.90)
+  closes at 100 MHz on 0/6 seeds
+  timing resolution at median Fmax: 23.9 ns
+
+Place and route (hx8k, ct256)
+  logic cells   539/7680  (7%)
+  Fmax          93.21 - 102.24 MHz over 6 seeds (median 98.20)
+  closes at 100 MHz on 2/6 seeds
+  timing resolution at median Fmax: 10.2 ns

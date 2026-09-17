@@ -1,0 +1,384 @@
+Warning: No PCF file specified; IO pins will be placed automatically
+
+Info: Packing constants..
+Info: Packing IOs..
+Info: Packing LUT-FFs..
+Info:      146 LCs used as LUT4 only
+Info:      155 LCs used as LUT4 and DFF
+Info: Packing non-LUT FFs..
+Info:      215 LCs used as DFF only
+Info: Packing carries..
+Info:        3 LCs used as CARRY only
+Info: Packing indirect carry+LUT pairs...
+Info:        1 LUTs merged into carry LCs
+Info: Packing RAMs..
+Info: Placing PLLs..
+Info: Packing special functions..
+Info: Packing PLLs..
+Info: Promoting globals..
+Info: promoting clk$SB_IO_IN (fanout 370)
+Info: promoting rst$SB_IO_IN [reset] (fanout 239)
+Info: promoting sample_SB_LUT4_I3_O [cen] (fanout 96)
+Info: promoting sample_SB_LUT4_I0_1_O [cen] (fanout 96)
+Info: Constraining chains...
+Info:       13 LCs used to legalise carry chains.
+Info: Checksum: 0x93822021
+
+Info: Device utilisation:
+Info: 	         ICESTORM_LC:     539/   7680     7%
+Info: 	        ICESTORM_RAM:       0/     32     0%
+Info: 	               SB_IO:       7/    206     3%
+Info: 	               SB_GB:       4/      8    50%
+Info: 	        ICESTORM_PLL:       0/      2     0%
+Info: 	         SB_WARMBOOT:       0/      1     0%
+
+Info: Placed 0 cells based on constraints.
+Info: Creating initial analytic placement for 390 cells, random placement wirelen = 13474.
+Info:     at initial placer iter 0, wirelen = 308
+Info:     at initial placer iter 1, wirelen = 248
+Info:     at initial placer iter 2, wirelen = 233
+Info:     at initial placer iter 3, wirelen = 225
+Info: Running main analytical placer, max placement attempts per cell = 37812.
+Info:     at iteration #1, type ALL: wirelen solved = 238, spread = 1903, legal = 2277; time = 0.01s
+Info:     at iteration #2, type ALL: wirelen solved = 280, spread = 1658, legal = 2337; time = 0.01s
+Info:     at iteration #3, type ALL: wirelen solved = 378, spread = 1985, legal = 2718; time = 0.01s
+Info:     at iteration #4, type ALL: wirelen solved = 333, spread = 1949, legal = 2415; time = 0.01s
+Info:     at iteration #5, type ALL: wirelen solved = 358, spread = 1720, legal = 2439; time = 0.01s
+Info:     at iteration #6, type ALL: wirelen solved = 393, spread = 1782, legal = 2736; time = 0.01s
+Info: HeAP Placer Time: 0.10s
+Info:   of which solving equations: 0.06s
+Info:   of which spreading cells: 0.00s
+Info:   of which strict legalisation: 0.02s
+
+Info: Running simulated annealing placer for refinement.
+Info:   at iteration #1: temp = 0.000000, timing cost = 47, wirelen = 2277
+Info:   at iteration #5: temp = 0.000000, timing cost = 41, wirelen = 1476
+Info:   at iteration #10: temp = 0.000000, timing cost = 31, wirelen = 1235
+Info:   at iteration #15: temp = 0.000000, timing cost = 33, wirelen = 1166
+Info:   at iteration #20: temp = 0.000000, timing cost = 32, wirelen = 1128
+Info:   at iteration #25: temp = 0.000000, timing cost = 31, wirelen = 1102
+Info:   at iteration #27: temp = 0.000000, timing cost = 31, wirelen = 1092 
+Info: SA placement time 0.23s
+
+Info: Max frequency for clock 'clk$SB_IO_IN_$glb_clk': 93.85 MHz (FAIL at 100.00 MHz)
+
+Info: Max delay <async>                       -> posedge clk$SB_IO_IN_$glb_clk: 7.84 ns
+Info: Max delay posedge clk$SB_IO_IN_$glb_clk -> <async>                      : 4.57 ns
+
+Info: Slack histogram:
+Info:  legend: * represents 2 endpoint(s)
+Info:          + represents [1,2) endpoint(s)
+Info: [  -655,   -192) |***+
+Info: [  -192,    271) |****+
+Info: [   271,    734) |***+
+Info: [   734,   1197) |*******+
+Info: [  1197,   1660) |********+
+Info: [  1660,   2123) |********+
+Info: [  2123,   2586) |************************+
+Info: [  2586,   3049) |*******************************+
+Info: [  3049,   3512) |**********+
+Info: [  3512,   3975) |********+
+Info: [  3975,   4438) |**************+
+Info: [  4438,   4901) |********+
+Info: [  4901,   5364) |*************************+
+Info: [  5364,   5827) |*********+
+Info: [  5827,   6290) |*****************+
+Info: [  6290,   6753) |*************+
+Info: [  6753,   7216) |*******************************************+
+Info: [  7216,   7679) |******************************+
+Info: [  7679,   8142) |*************************+
+Info: [  8142,   8605) |************************************************************ 
+Info: Checksum: 0x43a4d5a8
+
+Info: Routing..
+Info: Setting up routing queue.
+Info: Routing 1403 arcs.
+Info:            |   (re-)routed arcs  |   delta    | remaining|       time spent     |
+Info:    IterCnt |  w/ripup   wo/ripup |  w/r  wo/r |      arcs| batch(sec) total(sec)|
+Info:       1000 |       14        863 |   14   863 |       419|       0.10       0.10|
+Info:       1446 |       38       1274 |   24   411 |         0|       0.12       0.22|
+Info: Routing complete.
+Info: Router1 time 0.22s
+Info: Checksum: 0xc6d5afbc
+
+Info: Critical path report for clock 'clk$SB_IO_IN_$glb_clk' (posedge -> posedge):
+Info:       type curr  total name
+Info:   clk-to-q  0.54  0.54 Source in_b.shifted_SB_DFFSR_Q_DFFLC.O
+Info:    routing  0.59  1.13 Net in_b.shifted[2] (1,4) -> (1,4)
+Info:                          Sink coinc.b_pulse_SB_LUT4_O_LC.I2
+Info:                          Defined in:
+Info:                               rtl/pulse_in.v:20.15-20.22
+Info:      logic  0.38  1.51 Source coinc.b_pulse_SB_LUT4_O_LC.O
+Info:    routing  1.27  2.78 Net b_pulse (1,4) -> (5,5)
+Info:                          Sink counts.coincident_SB_LUT4_O_LC.I2
+Info:                          Defined in:
+Info:                               rtl/pulse_in.v:17.17-17.22
+Info:      logic  0.38  3.16 Source counts.coincident_SB_LUT4_O_LC.O
+Info:    routing  0.59  3.75 Net coincident (5,5) -> (5,6)
+Info:                          Sink counts.coincident_SB_LUT4_I1_LC.I1
+Info:                          Defined in:
+Info:                               rtl/counters.v:15.17-15.27
+Info:      logic  0.26  4.01 Source counts.coincident_SB_LUT4_I1_LC.COUT
+Info:    routing  0.00  4.01 Net counts.coincident_SB_CARRY_I0_CO[1] (5,6) -> (5,6)
+Info:                          Sink counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_9_LC.CIN
+Info:                          Defined in:
+Info:                               rtl/counters.v:31.23-31.42
+Info:                               C:\Users\Master Dragoo\tools\oss-cad-suite\bin\../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:      logic  0.13  4.13 Source counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_9_LC.COUT
+Info:    routing  0.00  4.13 Net counts.coincident_SB_CARRY_I0_CO[2] (5,6) -> (5,6)
+Info:                          Sink counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_20_LC.CIN
+Info:                          Defined in:
+Info:                               rtl/counters.v:31.23-31.42
+Info:                               C:\Users\Master Dragoo\tools\oss-cad-suite\bin\../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:      logic  0.13  4.26 Source counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_20_LC.COUT
+Info:    routing  0.00  4.26 Net counts.coincident_SB_CARRY_I0_CO[3] (5,6) -> (5,6)
+Info:                          Sink counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_23_LC.CIN
+Info:                          Defined in:
+Info:                               rtl/counters.v:31.23-31.42
+Info:                               C:\Users\Master Dragoo\tools\oss-cad-suite\bin\../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:      logic  0.13  4.38 Source counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_23_LC.COUT
+Info:    routing  0.00  4.38 Net counts.coincident_SB_CARRY_I0_CO[4] (5,6) -> (5,6)
+Info:                          Sink counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_24_LC.CIN
+Info:                          Defined in:
+Info:                               rtl/counters.v:31.23-31.42
+Info:                               C:\Users\Master Dragoo\tools\oss-cad-suite\bin\../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:      logic  0.13  4.51 Source counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_24_LC.COUT
+Info:    routing  0.00  4.51 Net counts.coincident_SB_CARRY_I0_CO[5] (5,6) -> (5,6)
+Info:                          Sink counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_25_LC.CIN
+Info:                          Defined in:
+Info:                               rtl/counters.v:31.23-31.42
+Info:                               C:\Users\Master Dragoo\tools\oss-cad-suite\bin\../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:      logic  0.13  4.64 Source counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_25_LC.COUT
+Info:    routing  0.00  4.64 Net counts.coincident_SB_CARRY_I0_CO[6] (5,6) -> (5,6)
+Info:                          Sink counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_26_LC.CIN
+Info:                          Defined in:
+Info:                               rtl/counters.v:31.23-31.42
+Info:                               C:\Users\Master Dragoo\tools\oss-cad-suite\bin\../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:      logic  0.13  4.76 Source counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_26_LC.COUT
+Info:    routing  0.00  4.76 Net counts.coincident_SB_CARRY_I0_CO[7] (5,6) -> (5,6)
+Info:                          Sink counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_27_LC.CIN
+Info:                          Defined in:
+Info:                               rtl/counters.v:31.23-31.42
+Info:                               C:\Users\Master Dragoo\tools\oss-cad-suite\bin\../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:      logic  0.13  4.89 Source counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_27_LC.COUT
+Info:    routing  0.20  5.08 Net counts.coincident_SB_CARRY_I0_CO[8] (5,6) -> (5,7)
+Info:                          Sink counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_28_LC.CIN
+Info:                          Defined in:
+Info:                               rtl/counters.v:31.23-31.42
+Info:                               C:\Users\Master Dragoo\tools\oss-cad-suite\bin\../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:      logic  0.13  5.21 Source counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_28_LC.COUT
+Info:    routing  0.00  5.21 Net counts.coincident_SB_CARRY_I0_CO[9] (5,7) -> (5,7)
+Info:                          Sink counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_29_LC.CIN
+Info:                          Defined in:
+Info:                               rtl/counters.v:31.23-31.42
+Info:                               C:\Users\Master Dragoo\tools\oss-cad-suite\bin\../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:      logic  0.13  5.34 Source counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_29_LC.COUT
+Info:    routing  0.00  5.34 Net counts.coincident_SB_CARRY_I0_CO[10] (5,7) -> (5,7)
+Info:                          Sink counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_30_LC.CIN
+Info:                          Defined in:
+Info:                               rtl/counters.v:31.23-31.42
+Info:                               C:\Users\Master Dragoo\tools\oss-cad-suite\bin\../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:      logic  0.13  5.46 Source counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_30_LC.COUT
+Info:    routing  0.00  5.46 Net counts.coincident_SB_CARRY_I0_CO[11] (5,7) -> (5,7)
+Info:                          Sink counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_LC.CIN
+Info:                          Defined in:
+Info:                               rtl/counters.v:31.23-31.42
+Info:                               C:\Users\Master Dragoo\tools\oss-cad-suite\bin\../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:      logic  0.13  5.59 Source counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_LC.COUT
+Info:    routing  0.00  5.59 Net counts.coincident_SB_CARRY_I0_CO[12] (5,7) -> (5,7)
+Info:                          Sink counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_1_LC.CIN
+Info:                          Defined in:
+Info:                               rtl/counters.v:31.23-31.42
+Info:                               C:\Users\Master Dragoo\tools\oss-cad-suite\bin\../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:      logic  0.13  5.71 Source counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_1_LC.COUT
+Info:    routing  0.00  5.71 Net counts.coincident_SB_CARRY_I0_CO[13] (5,7) -> (5,7)
+Info:                          Sink counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_2_LC.CIN
+Info:                          Defined in:
+Info:                               rtl/counters.v:31.23-31.42
+Info:                               C:\Users\Master Dragoo\tools\oss-cad-suite\bin\../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:      logic  0.13  5.84 Source counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_2_LC.COUT
+Info:    routing  0.00  5.84 Net counts.coincident_SB_CARRY_I0_CO[14] (5,7) -> (5,7)
+Info:                          Sink counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_3_LC.CIN
+Info:                          Defined in:
+Info:                               rtl/counters.v:31.23-31.42
+Info:                               C:\Users\Master Dragoo\tools\oss-cad-suite\bin\../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:      logic  0.13  5.97 Source counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_3_LC.COUT
+Info:    routing  0.00  5.97 Net counts.coincident_SB_CARRY_I0_CO[15] (5,7) -> (5,7)
+Info:                          Sink counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_4_LC.CIN
+Info:                          Defined in:
+Info:                               rtl/counters.v:31.23-31.42
+Info:                               C:\Users\Master Dragoo\tools\oss-cad-suite\bin\../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:      logic  0.13  6.09 Source counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_4_LC.COUT
+Info:    routing  0.20  6.29 Net counts.coincident_SB_CARRY_I0_CO[16] (5,7) -> (5,8)
+Info:                          Sink counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_5_LC.CIN
+Info:                          Defined in:
+Info:                               rtl/counters.v:31.23-31.42
+Info:                               C:\Users\Master Dragoo\tools\oss-cad-suite\bin\../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:      logic  0.13  6.41 Source counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_5_LC.COUT
+Info:    routing  0.00  6.41 Net counts.coincident_SB_CARRY_I0_CO[17] (5,8) -> (5,8)
+Info:                          Sink counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_6_LC.CIN
+Info:                          Defined in:
+Info:                               rtl/counters.v:31.23-31.42
+Info:                               C:\Users\Master Dragoo\tools\oss-cad-suite\bin\../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:      logic  0.13  6.54 Source counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_6_LC.COUT
+Info:    routing  0.00  6.54 Net counts.coincident_SB_CARRY_I0_CO[18] (5,8) -> (5,8)
+Info:                          Sink counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_7_LC.CIN
+Info:                          Defined in:
+Info:                               rtl/counters.v:31.23-31.42
+Info:                               C:\Users\Master Dragoo\tools\oss-cad-suite\bin\../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:      logic  0.13  6.66 Source counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_7_LC.COUT
+Info:    routing  0.00  6.66 Net counts.coincident_SB_CARRY_I0_CO[19] (5,8) -> (5,8)
+Info:                          Sink counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_8_LC.CIN
+Info:                          Defined in:
+Info:                               rtl/counters.v:31.23-31.42
+Info:                               C:\Users\Master Dragoo\tools\oss-cad-suite\bin\../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:      logic  0.13  6.79 Source counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_8_LC.COUT
+Info:    routing  0.00  6.79 Net counts.coincident_SB_CARRY_I0_CO[20] (5,8) -> (5,8)
+Info:                          Sink counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_10_LC.CIN
+Info:                          Defined in:
+Info:                               rtl/counters.v:31.23-31.42
+Info:                               C:\Users\Master Dragoo\tools\oss-cad-suite\bin\../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:      logic  0.13  6.92 Source counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_10_LC.COUT
+Info:    routing  0.00  6.92 Net counts.coincident_SB_CARRY_I0_CO[21] (5,8) -> (5,8)
+Info:                          Sink counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_11_LC.CIN
+Info:                          Defined in:
+Info:                               rtl/counters.v:31.23-31.42
+Info:                               C:\Users\Master Dragoo\tools\oss-cad-suite\bin\../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:      logic  0.13  7.04 Source counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_11_LC.COUT
+Info:    routing  0.00  7.04 Net counts.coincident_SB_CARRY_I0_CO[22] (5,8) -> (5,8)
+Info:                          Sink counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_12_LC.CIN
+Info:                          Defined in:
+Info:                               rtl/counters.v:31.23-31.42
+Info:                               C:\Users\Master Dragoo\tools\oss-cad-suite\bin\../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:      logic  0.13  7.17 Source counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_12_LC.COUT
+Info:    routing  0.00  7.17 Net counts.coincident_SB_CARRY_I0_CO[23] (5,8) -> (5,8)
+Info:                          Sink counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_13_LC.CIN
+Info:                          Defined in:
+Info:                               rtl/counters.v:31.23-31.42
+Info:                               C:\Users\Master Dragoo\tools\oss-cad-suite\bin\../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:      logic  0.13  7.30 Source counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_13_LC.COUT
+Info:    routing  0.20  7.49 Net counts.coincident_SB_CARRY_I0_CO[24] (5,8) -> (5,9)
+Info:                          Sink counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_14_LC.CIN
+Info:                          Defined in:
+Info:                               rtl/counters.v:31.23-31.42
+Info:                               C:\Users\Master Dragoo\tools\oss-cad-suite\bin\../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:      logic  0.13  7.62 Source counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_14_LC.COUT
+Info:    routing  0.00  7.62 Net counts.coincident_SB_CARRY_I0_CO[25] (5,9) -> (5,9)
+Info:                          Sink counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_15_LC.CIN
+Info:                          Defined in:
+Info:                               rtl/counters.v:31.23-31.42
+Info:                               C:\Users\Master Dragoo\tools\oss-cad-suite\bin\../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:      logic  0.13  7.74 Source counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_15_LC.COUT
+Info:    routing  0.00  7.74 Net counts.coincident_SB_CARRY_I0_CO[26] (5,9) -> (5,9)
+Info:                          Sink counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_16_LC.CIN
+Info:                          Defined in:
+Info:                               rtl/counters.v:31.23-31.42
+Info:                               C:\Users\Master Dragoo\tools\oss-cad-suite\bin\../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:      logic  0.13  7.87 Source counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_16_LC.COUT
+Info:    routing  0.00  7.87 Net counts.coincident_SB_CARRY_I0_CO[27] (5,9) -> (5,9)
+Info:                          Sink counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_17_LC.CIN
+Info:                          Defined in:
+Info:                               rtl/counters.v:31.23-31.42
+Info:                               C:\Users\Master Dragoo\tools\oss-cad-suite\bin\../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:      logic  0.13  7.99 Source counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_17_LC.COUT
+Info:    routing  0.00  7.99 Net counts.coincident_SB_CARRY_I0_CO[28] (5,9) -> (5,9)
+Info:                          Sink counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_18_LC.CIN
+Info:                          Defined in:
+Info:                               rtl/counters.v:31.23-31.42
+Info:                               C:\Users\Master Dragoo\tools\oss-cad-suite\bin\../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:      logic  0.13  8.12 Source counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_18_LC.COUT
+Info:    routing  0.00  8.12 Net counts.coincident_SB_CARRY_I0_CO[29] (5,9) -> (5,9)
+Info:                          Sink counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_19_LC.CIN
+Info:                          Defined in:
+Info:                               rtl/counters.v:31.23-31.42
+Info:                               C:\Users\Master Dragoo\tools\oss-cad-suite\bin\../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:      logic  0.13  8.25 Source counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_19_LC.COUT
+Info:    routing  0.00  8.25 Net counts.coincident_SB_CARRY_I0_CO[30] (5,9) -> (5,9)
+Info:                          Sink counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_21_LC.CIN
+Info:                          Defined in:
+Info:                               rtl/counters.v:31.23-31.42
+Info:                               C:\Users\Master Dragoo\tools\oss-cad-suite\bin\../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:      logic  0.13  8.37 Source counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_21_LC.COUT
+Info:    routing  0.26  8.63 Net counts.coincident_SB_CARRY_I0_CO[31] (5,9) -> (5,9)
+Info:                          Sink counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_22_LC.I3
+Info:                          Defined in:
+Info:                               rtl/counters.v:31.23-31.42
+Info:                               C:\Users\Master Dragoo\tools\oss-cad-suite\bin\../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:      logic  0.31  8.95 Source counts.coincident_SB_LUT4_I1_O_SB_LUT4_O_22_LC.O
+Info:    routing  0.59  9.53 Net counts.coincident_SB_LUT4_I1_O[31] (5,9) -> (5,10)
+Info:                          Sink counts.c_live_SB_DFFSR_Q_DFFLC.I0
+Info:                          Defined in:
+Info:                               rtl/counters.v:31.23-31.42
+Info:                               C:\Users\Master Dragoo\tools\oss-cad-suite\bin\../share/yosys/ice40/arith_map.v:33.26-33.27
+Info:      setup  0.47  10.00 Source counts.c_live_SB_DFFSR_Q_DFFLC.I0
+Info: 6.12 ns logic, 3.88 ns routing
+
+Info: Critical path report for cross-domain path '<async>' -> 'posedge clk$SB_IO_IN_$glb_clk':
+Info:       type curr  total name
+Info:     source  0.00  0.00 Source rst$sb_io.D_IN_0
+Info:    routing  1.65  1.65 Net rst$SB_IO_IN (0,9) -> (6,11)
+Info:                          Sink sample_SB_LUT4_I3_LC.I2
+Info:                          Defined in:
+Info:                               rtl/uart_tx.v:15.17-15.20
+Info:      logic  0.38  2.03 Source sample_SB_LUT4_I3_LC.O
+Info:    routing  2.44  4.47 Net sample_SB_LUT4_I3_O (6,11) -> (16,0)
+Info:                          Sink $gbuf_sample_SB_LUT4_I3_O_$glb_ce.USER_SIGNAL_TO_GLOBAL_BUFFER
+Info:      logic  0.62  5.09 Source $gbuf_sample_SB_LUT4_I3_O_$glb_ce.GLOBAL_BUFFER_OUTPUT
+Info:    routing  0.60  5.69 Net sample_SB_LUT4_I3_O_$glb_ce (16,0) -> (4,13)
+Info:                          Sink counts.a_count_SB_DFFESR_Q_15_DFFLC.CEN
+Info:      setup  0.10  5.79 Source counts.a_count_SB_DFFESR_Q_15_DFFLC.CEN
+Info: 1.10 ns logic, 4.70 ns routing
+
+Info: Critical path report for cross-domain path 'posedge clk$SB_IO_IN_$glb_clk' -> '<async>':
+Info:       type curr  total name
+Info:   clk-to-q  0.54  0.54 Source send.bytes_left_SB_DFFESR_Q_3_D_SB_LUT4_O_LC.O
+Info:    routing  0.59  1.13 Net send.bytes_left[0] (7,11) -> (7,11)
+Info:                          Sink send.bytes_left_SB_LUT4_I3_LC.I0
+Info:                          Defined in:
+Info:                               rtl/readout.v:53.27-53.44
+Info:                               C:\Users\Master Dragoo\tools\oss-cad-suite\bin\../share/yosys/ice40/arith_map.v:51.21-51.22
+Info:      logic  0.45  1.58 Source send.bytes_left_SB_LUT4_I3_LC.O
+Info:    routing  2.02  3.59 Net send.bytes_left_SB_LUT4_I3_O[0] (7,11) -> (2,1)
+Info:                          Sink busy_SB_LUT4_O_LC.I2
+Info:                          Defined in:
+Info:                               rtl/readout.v:53.27-53.44
+Info:                               C:\Users\Master Dragoo\tools\oss-cad-suite\bin\../share/yosys/ice40/arith_map.v:62.5-70.4
+Info:                               C:\Users\Master Dragoo\tools\oss-cad-suite\bin\../share/yosys/ice40/cells_map.v:6.21-6.22
+Info:      logic  0.38  3.97 Source busy_SB_LUT4_O_LC.O
+Info:    routing  0.59  4.56 Net busy$SB_IO_OUT (2,1) -> (2,0)
+Info:                          Sink busy$sb_io.D_OUT_0
+Info:                          Defined in:
+Info:                               rtl/readout.v:20.17-20.21
+Info: 1.37 ns logic, 3.19 ns routing
+
+ERROR: Max frequency for clock 'clk$SB_IO_IN_$glb_clk': 99.97 MHz (FAIL at 100.00 MHz)
+
+Info: Max delay <async>                       -> posedge clk$SB_IO_IN_$glb_clk: 5.79 ns
+Info: Max delay posedge clk$SB_IO_IN_$glb_clk -> <async>                      : 4.56 ns
+
+Info: Slack histogram:
+Info:  legend: * represents 2 endpoint(s)
+Info:          + represents [1,2) endpoint(s)
+Info: [    -3,    425) |***+
+Info: [   425,    853) |***+
+Info: [   853,   1281) |*****+
+Info: [  1281,   1709) |********+
+Info: [  1709,   2137) |********+
+Info: [  2137,   2565) |**********+
+Info: [  2565,   2993) |**********+
+Info: [  2993,   3421) |*******+
+Info: [  3421,   3849) |***********************************************+
+Info: [  3849,   4277) |******************+
+Info: [  4277,   4705) |**********************+
+Info: [  4705,   5133) |**************+
+Info: [  5133,   5561) |********+
+Info: [  5561,   5989) |***************+
+Info: [  5989,   6417) |************+
+Info: [  6417,   6845) |*************************************+
+Info: [  6845,   7273) |*********+
+Info: [  7273,   7701) |**************+
+Info: [  7701,   8129) |**********************************+
+Info: [  8129,   8557) |************************************************************ 
+1 warning, 1 error
+
+Info: Program finished normally.

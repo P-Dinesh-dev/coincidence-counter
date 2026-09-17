@@ -1,0 +1,23 @@
+# iCE40 synthesis using classic ABC for LUT mapping.
+#
+# The stock synth_ice40 flow calls abc9, which crashes in this Yosys build
+# (a Windows packaging bug in the experimental xaiger2 backend, not anything
+# to do with this design). So the flow is split: everything up to LUT mapping
+# is stock, the LUT mapping itself is done with classic `abc -lut 4`, and the
+# tail of the stock flow runs unchanged.
+
+read_verilog rtl/pulse_in.v rtl/coincidence.v rtl/counters.v rtl/uart_tx.v rtl/readout.v rtl/top.v
+
+synth_ice40 -top top -run :map_luts
+
+ice40_wrapcarry -unwrap
+techmap -map +/ice40/latches_map.v
+abc -lut 4
+techmap -map +/ice40/ff_map.v
+clean
+opt_lut -tech ice40
+
+synth_ice40 -top top -run map_cells:
+
+stat
+write_json synth/top_ice40.json

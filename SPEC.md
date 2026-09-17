@@ -367,3 +367,121 @@ Figure: `figures/stage2_accidentals.png`
 Needs an HDL simulator. None is installed, and WSL has no distribution.
 Neither costs money; both cost bandwidth, so the choice is the user's.
 The RTL and the model are both written and waiting.
+
+---
+
+## Stage 2b — Verilog equals the model ✅ PASSED
+
+### cocotb abandoned, and why
+
+The plan called for cocotb. It does not work on this machine: `vvp.exe` cannot
+load cocotb's VPI library because this is the **Microsoft Store build of
+Python**, whose `python313.dll` lives in a restricted `WindowsApps` directory
+that a non-Python process cannot load from. Failure code `0xC0000135`,
+`STATUS_DLL_NOT_FOUND`.
+
+Rather than install a second Python, the testbench drives the RTL from a
+**stimulus file**. Python writes one line per clock cycle, Icarus replays it
+through the real Verilog, and the count comes back on stdout. Fewer moving
+parts, no Python inside the simulator, and it proves exactly the same thing.
+
+`tb/tb_coincidence.v` samples on the **falling** edge. By then the rising edge
+has latched the previous cycle's state and this cycle's inputs have settled,
+so the combinational output belongs entirely to one cycle. Sampling on the
+rising edge would straddle two and miscount — this was caught by reasoning
+about it before running, and the reasoning is written into the file.
+
+### Result
+
+```
+3,931 and 3,909 pulses over 199,987 cycles
+
+ window    verilog      model   verdict
+      1        227        227   equal
+      2        364        364   equal
+      5        797        797   equal
+     17      2,269      2,269   equal
+     50      4,931      4,931   equal
+    200      7,619      7,619   equal
+```
+
+Exact agreement at every window, `window = 1` included — the boundary case
+where the off-by-one found in Stage 2 would have shown up. The Verilog and the
+model now confirm each other.
+
+**Gate 2b passed.**
+
+---
+
+## Stage 3 — Implementation evidence, no board ✅ PASSED
+
+The honest substitute for owning hardware. It does not prove the design
+*runs* — only silicon proves that — but it establishes that the logic maps to
+a real device, fits, and closes timing at a stated clock, using the same tools
+that would build the bitstream.
+
+### Three real problems found by trying to build it
+
+**1. The top level did not fit.** Three 32-bit counters brought out as pins
+need 96 IO; the target package has 39. Place-and-route failed with
+`Unable to find a placement location`. The fix was the UART that was in the
+plan all along — `rtl/uart_tx.v` and `rtl/readout.v` serialise the twelve
+bytes out of one pin. The coincidence window became a synthesis parameter for
+the same reason: as a port it would have cost sixteen more pins.
+
+Final IO count: **7**. This is why synthesis belongs in the loop and not at
+the end.
+
+**2. The design closed at only 31.9 MHz.** The critical path report named it
+exactly: `b_left` flop → decrement → a 16-bit `> 0` reduction → `coincident` →
+the 32-bit counter carry chain.
+
+The fix replaces the combinational comparison with a registered `a_active`
+flag carrying identical information, computed one cycle early where the answer
+is already being worked out. **31.9 → 40.1 MHz on the same part.** Gate 2b was
+re-run immediately afterwards and still gives exact agreement — which is the
+entire reason for having a gate that demands exactness rather than plausibility.
+
+**3. Yosys's ABC9 backend crashes on this build.** Both `synth_ice40` and
+`synth_ecp5` abort inside the experimental `write_xaiger2` backend
+(`Assert 'data_start == f->tellp()' failed`). Not a property of this design.
+`synth/ice40.ys` splits the flow and does LUT mapping with classic
+`abc -lut 4` instead; the rest of the stock flow runs unchanged. Note that
+`-noabc` is *not* a workaround — it leaves `$_ANDNOT_` cells that nextpnr
+refuses to place.
+
+### Result
+
+```
+Synthesis (yosys, iCE40)
+  LUT4            301
+  flip-flops      370
+  carry cells     141
+
+Place and route (up5k, sg48)      low-power part
+  logic cells   539/5280  (10%)
+  Fmax          40.05 - 43.28 MHz over 6 seeds (median 41.90)
+  timing resolution at median Fmax: 23.9 ns
+
+Place and route (hx8k, ct256)     speed part
+  logic cells   539/7680  (7%)
+  Fmax          93.21 - 102.24 MHz over 6 seeds (median 98.20)
+  closes at 100 MHz on 2/6 seeds
+  timing resolution at median Fmax: 10.2 ns
+```
+
+**Seeds, reported in full and deliberately.** Placement is stochastic. On
+hx8k the design closes at 100 MHz on two seeds out of six and misses on four.
+Quoting only the 102.24 MHz run would be picking the lucky one and calling it
+the answer. The honest statement is that this design is **marginal at 100 MHz
+on hx8k and comfortable at ~42 MHz on up5k**.
+
+**That margin is not a failure, because 100 MHz was never a requirement.** The
+clock sets timing resolution, and the physics sets what resolution is needed:
+coincidence windows for a muon telescope run from ~100 ns to several µs, so
+even the up5k's 23.9 ns is comfortably finer than required. The number that
+matters is stated, not a target that was assumed.
+
+Reports: `synth/reports/` — regenerate with `python synth/run_synth.py`.
+
+**Gate 3 passed.**

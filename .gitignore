@@ -2,3 +2,7 @@ __pycache__/
 *.pyc
 .venv/
 .ipynb_checkpoints/
+tb/stim.txt
+tb/sim.vvp
+tb/build/
+synth/*.json

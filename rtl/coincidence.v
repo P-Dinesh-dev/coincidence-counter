@@ -27,19 +27,46 @@ module coincidence #(
 );
 
     reg [WINDOW_BITS-1:0] a_left, b_left;   // cycles of window remaining
+    reg a_active, b_active;                 // "that counter is still running"
 
+    // a_active carries exactly the information `a_left > 0` would, but as a
+    // register rather than a comparison. Asking the question one cycle early,
+    // where the answer is already being computed, keeps a wide reduction out
+    // of the path that leads to the output.
+    //
+    // Place and route showed why this matters: with the comparison done
+    // combinationally the critical path ran flop -> decrement -> 16-bit
+    // reduction -> coincident -> 32-bit counter carry chain, and closed at
+    // only 31.9 MHz.
     always @(posedge clk) begin
         if (rst) begin
-            a_left <= 0;
-            b_left <= 0;
+            a_left <= 0;  a_active <= 1'b0;
+            b_left <= 0;  b_active <= 1'b0;
         end else begin
-            a_left <= a_pulse ? window : (a_left > 0 ? a_left - 1'b1 : 0);
-            b_left <= b_pulse ? window : (b_left > 0 ? b_left - 1'b1 : 0);
+            if (a_pulse) begin
+                a_left   <= window;
+                a_active <= (window != 0);
+            end else if (a_left > 0) begin
+                a_left   <= a_left - 1'b1;
+                a_active <= (a_left > 1);       // i.e. a_left-1 will be nonzero
+            end else begin
+                a_active <= 1'b0;
+            end
+
+            if (b_pulse) begin
+                b_left   <= window;
+                b_active <= (window != 0);
+            end else if (b_left > 0) begin
+                b_left   <= b_left - 1'b1;
+                b_active <= (b_left > 1);
+            end else begin
+                b_active <= 1'b0;
+            end
         end
     end
 
-    wire a_recent = a_pulse | (a_left > 0);
-    wire b_recent = b_pulse | (b_left > 0);
+    wire a_recent = a_pulse | a_active;
+    wire b_recent = b_pulse | b_active;
 
     assign coincident = (a_pulse & b_recent) | (b_pulse & a_recent);
 
