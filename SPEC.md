@@ -137,15 +137,6 @@ turnover and collapse.
 
 ---
 
-## Next: Stage 1 — Estimators and the four τ methods
-
-Inverting the curves, including the Lambert-W two-branch degeneracy: for any
-measured rate below `1/(eτ)` there are **two** true rates consistent with it,
-and the rate alone cannot say which. Plus four independent ways to measure τ,
-cross-checked against each other.
-
----
-
 ## Stage 1 — Estimators and the four τ methods ✅ PASSED
 
 Stage 0 ran forwards. This runs backwards, which is the direction a real
@@ -275,3 +266,104 @@ one of the four that is statistics-limited rather than bias-limited.
 Figure: `figures/stage1_degeneracy_and_error.png`
 
 **Gate 1 passed.**
+
+---
+
+## Stage 2 — Coincidence logic in RTL
+
+### The Verilog
+
+| File | Lines | Job |
+|---|---|---|
+| `rtl/pulse_in.v` | 33 | async detector pulse → one clean pulse in our clock domain |
+| `rtl/coincidence.v` | 46 | programmable two-channel window |
+| `rtl/counters.v` | 41 | three counters latched from one common instant |
+| `rtl/top.v` | 41 | wiring |
+
+**Why two flip-flops in `pulse_in`.** The discriminator has no idea our clock
+exists, so it can change exactly when a flop samples it, leaving that flop
+metastable — briefly neither 0 nor 1, with different readers disagreeing about
+which. The first flop is *allowed* to go metastable and given a full clock
+period to settle; only the second is ever read. A third stage holds the
+previous value so an edge can be detected, giving one pulse per rising edge
+rather than one per cycle of a wide input.
+
+**Why the counters share one latch strobe.** If singles and coincidences were
+read at different instants they would describe slightly different experiments,
+and the accidental prediction below would stop meaning anything.
+
+**Why no correction in hardware.** The FPGA counts and reports how long it
+counted for. Correction happens in software where it can be inspected and
+argued with. Burning an estimator into fabric would make it the one part of
+the instrument nobody can check.
+
+### `sim/rtl_model.py` — a cycle-faithful replay
+
+Not a second design: the same logic written where it can be reasoned about.
+It makes the coincidence scheme testable today without a Verilog simulator,
+and later lets us demand the Verilog agree *event for event* rather than
+merely look about right.
+
+It steps only cycles on which something happens. Stepping all of them would be
+10⁸ iterations per simulated second and would reveal nothing, since state only
+changes when a pulse arrives.
+
+`to_cycles` deliberately merges particles landing in the same clock cycle —
+the FPGA cannot resolve finer than its own clock, so that is a real one-cycle
+dead time and belongs in the model.
+
+### Gate 2a — a prediction that could have failed ✅ PASSED
+
+Two Poisson streams sharing no particles, so every coincidence reported is by
+construction accidental. Sweep the window; theory says the rate is
+`2·τ·R₁·R₂` — linear, through the origin.
+
+```
+  window     pairs  2*t*R1*R2     dev     asserts   /pairs   floor
+       10      21.8       20.9   +1.50        21.8   0.9992  0.9990
+       50     100.6      100.7   -0.02       100.4   0.9977  0.9950
+      100     200.1      200.3   -0.14       199.2   0.9956  0.9900
+      200     397.4      399.7   -0.89       393.3   0.9898  0.9802
+      500     993.0      997.7   -1.14       968.5   0.9753  0.9516
+
+  pairs vs prediction: worst 1.50 sigma against 3 -- ok
+```
+
+**Pairs versus asserts.** The formula counts *pairs*. The RTL counts *cycles
+on which it raised `coincident`*, which is at most one per cycle however many
+partners were in range. So asserts sit slightly below pairs, by more as the
+window widens. Bounded above by the pair count and below by the case where
+each pulse yields at most one assert — the measurement lands between those
+bounds at every window, which is checked rather than assumed.
+
+### Two bugs found here, both worth recording
+
+**1. Off-by-one between the model and the RTL.** The model first used
+`cycle - last <= window - 1` for the "recently fired" flag. Tracing the actual
+register makes it `<= window`: a pulse at cycle `c` sets `a_left` to `window`
+at `c+1`, and it decrements from there, so it stays above zero through `c+window`.
+
+Two cycles out of `2w+1` is **10% at w=10**. Small in cycles, large in
+results — and precisely the class of error the "Verilog must equal the model"
+gate exists to catch.
+
+**2. Nominal rates used where measured rates belong.** The prediction was
+being fed the rates we *asked* for (10,000/s) rather than the rates the
+counter actually saw (9,975 and 9,991.6/s). Poisson scatter alone puts those
+0.25% apart — larger than the real effect under study. The formula takes
+measured singles rates, and a real experiment has no access to the nominal
+ones anyway.
+
+**A wrong gate, also recorded.** The first version of this test asserted the
+fitted intercept would sit near −0.5 cycles. That was a guess dressed as a
+prediction, it failed, and the correct response was to work out what the logic
+does rather than widen the threshold. The replacement gates on the quantity
+theory actually predicts, with `√N` error bars.
+
+Figure: `figures/stage2_accidentals.png`
+
+### Gate 2b — Verilog equals the model ⏸ BLOCKED
+
+Needs an HDL simulator. None is installed, and WSL has no distribution.
+Neither costs money; both cost bandwidth, so the choice is the user's.
+The RTL and the model are both written and waiting.
